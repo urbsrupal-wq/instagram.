@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Lite Demo</title>
+<style>
+:root{--bg:#fff;--muted:#8a8a8a;--border:#e9e9e9;--brand:#111;--accent:#3897f0;--card:#fff;--shadow:0 6px 20px rgba(0,0,0,0.06);}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;background:var(--bg);color:var(--brand);-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:var(--accent);}
+.hidden{display:none;}
+/* Login page */
+#login-page{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
+.center-wrap{max-width:420px;width:100%;}
+.login-box{background:var(--card);border:1px solid var(--border);padding:28px;border-radius:10px;text-align:center;box-shadow:var(--shadow);}
+.logo{font-family:"Grand Hotel","Cursive";font-size:42px;margin-bottom:10px;color:var(--brand);}
+.login-box input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid var(--border);font-size:15px;}
+.login-box button{width:100%;padding:10px;margin:10px 0 6px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;}
+.forgot{display:block;margin-top:6px;color:var(--muted);font-size:13px;cursor:pointer;}
+.divider{display:flex;align-items:center;margin:12px 0;color:var(--muted);font-size:13px;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border);margin:0 10px;}
+.fb-btn{background:#385185;color:#fff;border:none;border-radius:6px;width:100%;padding:9px;cursor:pointer;font-weight:600;}
+.signup-box{background:var(--card);border:1px solid var(--border);padding:12px;text-align:center;border-radius:10px;margin-top:12px;}
+.msg{font-size:13px;color:#d00;margin-top:6px;min-height:18px;cursor:default;}
+/* Feed */
+#feed-page{display:none;min-height:100vh;background:var(--bg);}
+.top-nav{position:fixed;top:0;left:0;right:0;height:56px;display:flex;align-items:center;justify-content:center;background:var(--card);border-bottom:1px solid var(--border);z-index:200;}
+.brand-img{font-family:"Grand Hotel","Cursive";font-size:30px;}
+.stories{display:flex;overflow-x:auto;padding:72px 12px 12px 12px;gap:12px;background:var(--bg);border-bottom:1px solid var(--border);}
+.story{flex:0 0 auto;text-align:center;width:76px;}
+.story .wrap{position:relative;width:72px;height:72px;margin:0 auto;}
+.story img{width:72px;height:72px;border-radius:50%;border:3px solid #f56060;object-fit:cover;}
+.story p{margin:6px 0 0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.feed{max-width:600px;margin:12px auto;padding-bottom:80px;position:relative;}
+.post{background:var(--card);margin-bottom:18px;border-radius:10px;border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);}
+.post-header{display:flex;align-items:center;padding:10px;gap:10px;}
+.profile-pic{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);}
+.post-img{width:100%;display:block;max-height:540px;object-fit:cover;background:#f4f4f4;}
+.post-actions{padding:10px;display:flex;gap:12px;align-items:center;}
+.post-actions button{background:none;border:none;font-size:22px;cursor:pointer;}
+.caption{padding:0 12px 12px;font-size:14px;line-height:1.3;}
+.post-meta{padding:0 12px 10px;color:var(--muted);font-size:13px;}
+.comment-box{padding:0 12px 12px;}
+.comment-box input{width:80%;padding:6px;border:1px solid var(--border);border-radius:6px;}
+.comment-box button{padding:6px 10px;margin-left:4px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--card);border-top:1px solid var(--border);display:flex;justify-content:space-around;align-items:center;font-size:22px;z-index:200;}
+/* Overlay panels */
+.overlay{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.35);display:none;z-index:300;}
+.panel{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--card);padding:18px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.12);width:360px;z-index:400;border:1px solid var(--border);}
+.panel h3{margin:4px 0 10px;}
+.panel input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid var(--border);}
+.panel button{width:100%;padding:10px;margin-top:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;}
+.panel .backLogin{font-size:13px;margin-top:8px;color:var(--muted);display:block;text-align:center;cursor:pointer;}
+.panel .backLogin a{color:var(--accent);}
+#msgSidebar{position:fixed;top:72px;right:4px;width:220px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.06);padding:8px;display:none;z-index:500;}
+#msgSidebar h4{margin:0 0 8px;font-size:14px;color:var(--brand);}
+.msgItem{padding:4px 6px;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+<div class="center-wrap">
+<div class="login-box">
+<div class="logo">Instagram</div>
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+<button id="loginBtn">Log In</button>
+<span class="forgot" id="forgotLink">Forgot password?</span>
+<div class="divider">OR</div>
+<button class="fb-btn" id="fbBtn">Continue with Facebook</button>
+</div>
+<div class="signup-box">Don't have an account? <a id="openCreate">Sign up</a></div>
+<div class="msg" id="loginMsg"></div>
+</div>
+</div>
+
+<!-- FEED -->
+<div id="feed-page">
+<div class="top-nav"><div class="brand-img">Instagram</div></div>
+<div class="stories" id="storiesRow"></div>
+<div class="feed" id="feedArea"></div>
+<button id="msgBtn" style="position:fixed;top:80px;right:10px;font-size:22px;">✉️</button>
+<div id="msgSidebar">
+<h4>Messages</h4>
+<div class="msgItem">User1: Hi!</div>
+<div class="msgItem">User2: Hello!</div>
+<div class="msgItem">User3: Demo message</div>
+</div>
+<div class="bottom-nav">
+<button title="Home" id="homeBtn">🏠</button>
+<button title="Search" id="searchBtn">🔍</button>
+<button title="Add" id="addBtn">➕</button>
+<button title="Reels" id="reelsBtn">🎞️</button>
+<button title="Profile" id="profileBtn">👤</button>
+</div>
+</div>
+
+<!-- CREATE ACCOUNT -->
+<div class="overlay" id="overlay"></div>
+<div class="panel hidden" id="createPanel">
+<h3>Create account</h3>
+<input id="newUser" placeholder="Choose username">
+<input id="newPass" type="password" placeholder="Choose password">
+<button id="createBtn">Create account</button>
+<div class="backLogin"><a id="backCreate">Back to Login</a></div>
+<div class="msg" id="createMsg"></div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div class="panel hidden" id="forgotPanel">
+<h3>Reset Password</h3>
+<div id="fpStep1">
+<input id="fpUser" placeholder="Enter username">
+<button id="sendReset">Send OTP</button>
+<div class="msg" id="forgotMsg"></div>
+</div>
+<div id="fpStep2" style="display:none;">
+<input id="fpOTP" placeholder="Enter OTP">
+<button id="verifyOTP">Verify OTP</button>
+<div class="msg" id="otpMsg"></div>
+</div>
+<div id="fpStep3" style="display:none;">
+<div id="revealPwd"></div>
+</div>
+<div class="backLogin"><a id="backForgot">Back to Login</a></div>
+</div>
+
+<script>
+// DATA
+let users=[{username:'ashwin',password:'12345',avatar:'https://picsum.photos/72?random=1'}];
+let otpDemo=null;
+let storiesData=[{name:'Ashwin',img:'https://picsum.photos/72?random=1'},{name:'Jabalpur Society',img:'https://picsum.photos/72?random=2'},{name:'Jabalpur Chapter',img:'https://picsum.photos/72?random=3'},{name:'Jabalpur Public',img:'https://picsum.photos/72?random=4'}];
+let postsData=[{user:'Jabalpur Society',img:'https://picsum.photos/500/300?random=5',caption:'Demo post 1'},{user:'Jabalpur Chapter',img:'https://picsum.photos/500/300?random=6',caption:'Demo post 2'},{user:'Jabalpur Public',img:'https://picsum.photos/500/300?random=7',caption:'Demo post 3'},{user:'Jabalpur AI',img:'https://picsum.photos/500/300?random=8',caption:'Demo post 4'}];
+
+// Panel functions
+function showPanel(id){document.getElementById('overlay').style.display='block';document.getElementById(id).classList.remove('hidden');}
+function hidePanel(id){document.getElementById('overlay').style.display='none';document.getElementById(id).classList.add('hidden');}
+
+// LOGIN
+document.getElementById('loginBtn').addEventListener('click',()=>{
+let u=document.getElementById('username').value.trim();
+let p=document.getElementById('password').value;
+document.getElementById('loginMsg').textContent='';
+let user=users.find(x=>x.username===u&&x.password===p);
+if(user){showFeed();}else{document.getElementById('loginMsg').textContent='Incorrect username or password';}
+});
+document.getElementById('password').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();});
+
+// Create account
+document.getElementById('openCreate').addEventListener('click',e=>{e.preventDefault();showPanel('createPanel');});
+document.getElementById('backCreate').addEventListener('click',()=>{hidePanel('createPanel');});
+document.getElementById('createBtn').addEventListener('click',()=>{
+let u=document.getElementById('newUser').value.trim();
+let p=document.getElementById('newPass').value.trim();
+document.getElementById('createMsg').textContent='';
+if(!u||!p){document.getElementById('createMsg').textContent='Enter username & password'; return;}
+if(users.find(x=>x.username===u)){document.getElementById('createMsg').textContent='Username exists'; return;}
+users.push({username:u,password:p,avatar:`https://picsum.photos/72?random=${Math.floor(Math.random()*100)}`});
+document.getElementById('createMsg').textContent='Account created ✅';
+setTimeout(()=>{hidePanel('createPanel');},800);
+});
+
+// Forgot password
+document.getElementById('forgotLink').addEventListener('click',()=>{showPanel('forgotPanel');document.getElementById('fpStep1').style.display='block';document.getElementById('fpStep2').style.display='none';document.getElementById('fpStep3').style.display='none';document.getElementById('forgotMsg').textContent='';});
+document.getElementById('backForgot').addEventListener('click',()=>{hidePanel('forgotPanel');});
+document.getElementById('sendReset').addEventListener('click',()=>{
+let u=document.getElementById('fpUser').value.trim();
+let user=users.find(x=>x.username===u);
+if(!user){document.getElementById('forgotMsg').textContent='No user found'; return;}
+otpDemo=Math.floor(100000+Math.random()*900000).toString();
+document.getElementById('fpStep1').style.display='none';
+document.getElementById('fpStep2').style.display='block';
+alert(`Demo OTP: ${otpDemo}`);
+});
+document.getElementById('verifyOTP').addEventListener('click',()=>{
+let otp=document.getElementById('fpOTP').value.trim();
+if(otp===otpDemo){
+document.getElementById('fpStep2').style.display='none';
+document.getElementById('fpStep3').style.display='block';
+let u=document.getElementById('fpUser').value.trim();
+let user=users.find(x=>x.username===u);
+document.getElementById('revealPwd').innerHTML=`Password: <strong>${user.password}</strong>`;
+}else{document.getElementById('otpMsg').textContent='Incorrect OTP';}
+});
+
+// FEED
+function showFeed(){
+document.getElementById('login-page').style.display='none';
+document.getElementById('feed-page').style.display='block';
+loadStories();loadPosts();
+}
+function loadStories(){
+let container=document.getElementById('storiesRow');container.innerHTML='';
+storiesData.forEach(s=>{
+let div=document.createElement('div');div.className='story';
+div.innerHTML=`<div class="wrap"><img src="${s.img}"></div><p>${s.name}</p>`;
+container.appendChild(div);
+});
+}
+function loadPosts(){
+let container=document.getElementById('feedArea');container.innerHTML='';
+postsData.forEach(p=>{
+let div=document.createElement('div');div.className='post';
+div.innerHTML=`<div class="post-header"><img src="https://picsum.photos/42?random=${Math.floor(Math.random()*100)}" class="profile-pic"><strong>${p.user}</strong></div><img src="${p.img}" class="post-img"><div class="post-actions"><button>❤️</button><button>💬</button><button>🔗</button></div><div class="caption">${p.caption}</div><div class="post-meta">10 likes • 1h ago</div><div class="comment-box"><input placeholder="Add a comment"><button>Post</button></div>`;
+container.appendChild(div);
+});
+}
+
+// Messages
+document.getElementById('msgBtn').addEventListener('click',()=>{
+let msg=document.getElementById('msgSidebar');
+msg.style.display=(msg.style.display==='none')?'block':'none';
+});
+</script>
+</body>
+</html>
